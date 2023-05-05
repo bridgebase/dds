@@ -72,7 +72,7 @@ struct moveGroupType
   int gap[7];
 };
 
-extern moveGroupType groupData[8192];
+extern struct moveGroupType groupData[8192];
 
 
 struct moveType
@@ -86,7 +86,7 @@ struct moveType
 
 struct movePlyType
 {
-  moveType move[14];
+  struct moveType move[14];
   int current;
   int last;
 };
@@ -109,15 +109,15 @@ struct pos
   /* Cards that win by rank, firstindex is depth. */
   int first[50];
   /* Hand that leads the trick for each ply */
-  moveType move[50];
+  struct moveType move[50];
   /* Presently winning move */
   int handRelFirst;
   /* The current hand, relative first hand */
   int tricksMAX;
   /* Aggregated tricks won by MAX */
-  highCardType winner[DDS_SUITS];
+  struct highCardType winner[DDS_SUITS];
   /* Winning rank of trick. */
-  highCardType secondBest[DDS_SUITS];
+  struct highCardType secondBest[DDS_SUITS];
   /* Second best rank. */
 };
 
@@ -149,14 +149,14 @@ struct absRankType // 2 bytes
 
 struct relRanksType // 120 bytes
 {
-  absRankType absRank[15][DDS_SUITS];
+  struct absRankType absRank[15][DDS_SUITS];
 };
 
 struct paramType
 {
   int noOfBoards;
-  boards * bop;
-  solvedBoards * solvedp;
+  struct boards * bop;
+  struct solvedBoards * solvedp;
   int error;
 };
 
