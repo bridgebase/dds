@@ -175,66 +175,74 @@ void System::Reset()
   CallbackCopyList[DDS_RUN_TRACE] = CopyPlaySingle;
 }
 
-
 void System::GetHardware(
   int& ncores,
   unsigned long long& kilobytesFree) const
 {
-  kilobytesFree = 0;
+  kilobytesFree = 52428;
   ncores = 1;
-  (void) System::GetCores(ncores);
-
-#if defined(_WIN32) || defined(__CYGWIN__)
-  // Using GlobalMemoryStatusEx instead of GlobalMemoryStatus
-  // was suggested by Lorne Anderson.
-  MEMORYSTATUSEX statex;
-  statex.dwLength = sizeof(statex);
-  GlobalMemoryStatusEx(&statex);
-  kilobytesFree = static_cast<unsigned long long>(
-                    statex.ullTotalPhys / 1024);
-
-  SYSTEM_INFO sysinfo;
-  GetSystemInfo(&sysinfo);
-  ncores = static_cast<int>(sysinfo.dwNumberOfProcessors);
   return;
-#endif
-
-#ifdef __APPLE__
-  // The code for Mac OS X was suggested by Matthew Kidd.
-
-  // This is physical memory, rather than "free" memory as below 
-  // for Linux.  Always leave 0.5 GB for the OS and other stuff. 
-  // It would be better to find free memory (how?) but in practice 
-  // the number of cores rather than free memory is almost certainly 
-  // the limit for Macs which have  standardized hardware (whereas 
-  // say a 32 core Linux server is hardly unusual).
-  FILE * fifo = popen("sysctl -n hw.memsize", "r");
-  fscanf(fifo, "%lld", &kilobytesFree);
-  fclose(fifo);
-
-  kilobytesFree /= 1024;
-  if (kilobytesFree > 500000)
-  {
-    kilobytesFree -= 500000;
-  }
-
-  ncores = sysconf(_SC_NPROCESSORS_ONLN);
-  return;
-#endif
-
-#ifdef __linux__
-  // Use half of the physical memory
-  long pages = sysconf (_SC_PHYS_PAGES);
-  long pagesize = sysconf (_SC_PAGESIZE);
-  if (pages > 0 && pagesize > 0)
-    kilobytesFree = static_cast<unsigned long long>(pages * pagesize / 1024 / 2);
-  else
-    kilobytesFree = 1024 * 1024; // guess 1GB
-
-  ncores = sysconf(_SC_NPROCESSORS_ONLN);
-  return;
-#endif
 }
+
+// void System::GetHardware(
+//   int& ncores,
+//   unsigned long long& kilobytesFree) const
+// {
+//   kilobytesFree = 0;
+//   ncores = 1;
+//   (void) System::GetCores(ncores);
+// 
+// #if defined(_WIN32) || defined(__CYGWIN__)
+//   // Using GlobalMemoryStatusEx instead of GlobalMemoryStatus
+//   // was suggested by Lorne Anderson.
+//   MEMORYSTATUSEX statex;
+//   statex.dwLength = sizeof(statex);
+//   GlobalMemoryStatusEx(&statex);
+//   kilobytesFree = static_cast<unsigned long long>(
+//                     statex.ullTotalPhys / 1024);
+// 
+//   SYSTEM_INFO sysinfo;
+//   GetSystemInfo(&sysinfo);
+//   ncores = static_cast<int>(sysinfo.dwNumberOfProcessors);
+//   return;
+// #endif
+// 
+// #ifdef __APPLE__
+//   // The code for Mac OS X was suggested by Matthew Kidd.
+// 
+//   // This is physical memory, rather than "free" memory as below 
+//   // for Linux.  Always leave 0.5 GB for the OS and other stuff. 
+//   // It would be better to find free memory (how?) but in practice 
+//   // the number of cores rather than free memory is almost certainly 
+//   // the limit for Macs which have  standardized hardware (whereas 
+//   // say a 32 core Linux server is hardly unusual).
+//   FILE * fifo = popen("sysctl -n hw.memsize", "r");
+//   fscanf(fifo, "%lld", &kilobytesFree);
+//   fclose(fifo);
+// 
+//   kilobytesFree /= 1024;
+//   if (kilobytesFree > 500000)
+//   {
+//     kilobytesFree -= 500000;
+//   }
+// 
+//   ncores = sysconf(_SC_NPROCESSORS_ONLN);
+//   return;
+// #endif
+// 
+// #ifdef __linux__
+//   // Use half of the physical memory
+//   long pages = sysconf (_SC_PHYS_PAGES);
+//   long pagesize = sysconf (_SC_PAGESIZE);
+//   if (pages > 0 && pagesize > 0)
+//     kilobytesFree = static_cast<unsigned long long>(pages * pagesize / 1024 / 2);
+//   else
+//     kilobytesFree = 1024 * 1024; // guess 1GB
+// 
+//   ncores = sysconf(_SC_NPROCESSORS_ONLN);
+//   return;
+// #endif
+// }
 
 
 int System::RegisterParams(
